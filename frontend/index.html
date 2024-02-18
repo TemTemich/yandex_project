@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send Expression</title>
+</head>
+<body>
+
+<h2>Submit Expression</h2>
+
+<!-- Input form for the expression -->
+<label for="expressionInput">Enter your expression:</label>
+<input type="text" id="expressionInput" placeholder="Type expression here...">
+<button id="sendButton">Send</button>
+
+<!-- Area to display the response ID -->
+<div id="responseId" style="margin-top: 20px;">
+    <!-- The response ID will be displayed here -->
+</div>
+
+<script>
+document.getElementById('sendButton').addEventListener('click', function() {
+    const expressionValue = document.getElementById('expressionInput').value;
+    const dataToSend = {
+        "expression": expressionValue
+    };
+    
+    fetch('http://localhost:8080/expressions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('responseId').textContent = "Response ID: " + data.id;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+</script>
+
+</body>
+</html>

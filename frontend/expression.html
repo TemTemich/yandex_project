@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Expression Info</title>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+        text-align: left;
+    }
+</style>
+</head>
+<body>
+
+<h2>Get Expression Information</h2>
+
+<!-- Input form for the expression -->
+<label for="expressionInput">Enter your expression:</label>
+<input type="text" id="expressionInput" placeholder="Type expression here...">
+<button id="getInfoButton">Get Info</button>
+
+<!-- Table to display the response -->
+<table id="responseTable" style="margin-top: 20px; display: none;">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- The response will be displayed here -->
+    </tbody>
+</table>
+
+<script>
+document.getElementById('getInfoButton').addEventListener('click', function() {
+    const expression = document.getElementById('expressionInput').value;
+    const url = `http://localhost:8080/expressions/${encodeURIComponent(expression)}`;
+    
+    fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const table = document.getElementById('responseTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        tbody.innerHTML = ''; // Clear previous results
+
+        // Insert new data into the table
+        const row = tbody.insertRow();
+        row.insertCell().textContent = data.id;
+        row.insertCell().textContent = data.status;
+        row.insertCell().textContent = data.result;
+
+        // Show the table
+        table.style.display = 'table';
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+</script>
+
+</body>
+</html>

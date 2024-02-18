@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  server:
+    container_name: server
+    build: ./orchestrator
+    restart: unless-stopped
+    depends_on:
+      storage:
+        condition: service_healthy
+    command: ["/server"]
+    environment:
+      DAEMON_URL: ${DAEMON_URL}
+    ports:
+      - "8080:8080"
+
+  daemon:
+    container_name: daemon
+    build: ./daemon
+    restart: unless-stopped
+    command: ["/daemon"]
+    environment:
+      SERVICE_URL: ${SERVICE_URL}
+    ports:
+      - "3030:3030"
+  
+  storage:
+    container_name: storage
+    image: postgres:15.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${STORAGE_PASSWORD}
+      POSTGRES_USER: ${STORAGE_USER}
+      POSTGRES_DB: ${STORAGE_NAME}
+      PGDATA: /data/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "${STORAGE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${STORAGE_PORT}:5432"
+    volumes:
+      - ./data/data.sql:/docker-entrypoint-initdb.d/data.sql
+
+
+networks:
+  service_network:
+   driver: bridge
