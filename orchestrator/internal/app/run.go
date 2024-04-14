@@ -53,6 +53,13 @@ func Run() error {
 			h.GetExpressionByID(w, r)
 		})
 	})
+	router.Route("/api/v1", func (r chi.Router){
+		r.Post("/register", ...)
+		r.Post("/login", ...)
+	})
+
+
+
 
 	log.Println("server is running on port 8080")
 	return http.ListenAndServe(":8080", router)
