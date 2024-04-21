@@ -14,12 +14,15 @@ type Storage struct {
 }
 
 func (s *Storage) GetExpressions(ctx context.Context) ([]*enteties.ArithmeticExpression, error) {
+	userID := ctx.Value("user_id")
 	rows, err := s.base.Query(
 		ctx,
 		`
 		SELECT id, expression, status, result
-		FROM expressions;
+		FROM expressions
+		WHERE user_id = $1;
 		`,
+		userID,
 	)
 	if err != nil {
 		return nil, err
@@ -35,12 +38,14 @@ func (s *Storage) GetExpressions(ctx context.Context) ([]*enteties.ArithmeticExp
 	return expressions, nil
 }
 
-func (s *Storage) GetExpression(id uuid.UUID) (*enteties.ArithmeticExpression, error) {
-	ctx := context.TODO()
+func (s *Storage) GetExpression(ctx context.Context, id uuid.UUID) (*enteties.ArithmeticExpression, error) {
+	userID := ctx.Value("user_id")
 	row, err := s.base.Query(ctx,
 		`
-	select status, result from expressions where id = $1;
-	`, id)
+	SELECT status, result 
+	FROM expressions
+	WHERE id = $1 AND user_id = $2;
+	`, id, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +126,7 @@ func (s *Storage) GetOperations(ctx context.Context) ([]*enteties.Operation, err
 	return operations, nil
 }
 
-func (s *Storage) AddExpression(expression *enteties.ArithmeticExpression) error {
-	ctx := context.Background()
+func (s *Storage) AddExpression(ctx context.Context, expression *enteties.ArithmeticExpression) error {
 	tx, err := s.base.Begin(ctx)
 	if err != nil {
 		return err
@@ -132,9 +136,9 @@ func (s *Storage) AddExpression(expression *enteties.ArithmeticExpression) error
 	// Внести данные экспрешина
 	if _, err := tx.Exec(ctx, `
 		INSERT INTO expressions
-		(id, "expression", created_at, done_at, status, "result")
-		VALUES($1, $2, current_timestamp, null, 'work', '');
-	`, expression.ID, expression.Expression); err != nil {
+		(id, "expression", user_id, created_at, done_at, status, "result")
+		VALUES($1, $2, $3, current_timestamp, null, 'work', '');
+	`, expression.ID, expression.Expression, expression.UserID); err != nil {
 		return err
 	}
 	for _, operation := range expression.Operations {

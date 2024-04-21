@@ -7,13 +7,54 @@ GUI доступен в папке frontend
 
 ## Примеры работы API:
 
+
+#### Зарегистрироваться
+
+Запрос:
+```shell
+curl --location 'http://localhost:8080/api/v1/register' \
+--header 'Content-Type: application/json' \
+--data '{
+    "login": "test",
+    "password": "1"
+}'
+```
+
+Ответ:
+```json
+{
+    "status": "ok"
+}
+```
+если пользователь существует:
+```json
+{
+    "error": "user already exist"
+}
+```
+
+#### Логин
+
+Запрос:
+```shell
+curl --location 'http://localhost:8080/api/v1/login' \
+--header 'Content-Type: application/json' \
+--data '{
+    "login": "test",
+    "password": "1"
+}'
+```
+если все ок, то придет статус 200
+если ошибка в пароле например статус 400
+
 #### Добавление выражения для вычисления:
 ---
-Запрос
-
+Куку получаем из запроса логина
+Запрос.
 ```bash
 curl --location 'http://localhost:8080/expressions' \
 --header 'Content-Type: application/json' \
+--header 'Cookie: Authorization-Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJkZjQ1OTg0NS1kMjI4LTQ5NjYtYTAxMC1mNzU1NTRlZDU0Y2IifQ.mSRR4Vk0qI8TyqRaKx6z1c2z-TkPqbrTa8U3NKyIbK4' \
 --data '{
     "expression":"2+2*2/2+2-3-10*27123+2+10000"
 }'
@@ -29,9 +70,11 @@ curl --location 'http://localhost:8080/expressions' \
 
 #### Узнать статус и результат по ID:
 ---
+Куку получаем из запроса логина
 Запрос
 ```bash
 curl --location 'http://localhost:8080/expressions/685da2a4-9ff8-4815-b954-297b8dac0c4e'
+--header 'Cookie: Authorization-Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJkZjQ1OTg0NS1kMjI4LTQ5NjYtYTAxMC1mNzU1NTRlZDU0Y2IifQ.mSRR4Vk0qI8TyqRaKx6z1c2z-TkPqbrTa8U3NKyIbK4' \
 ```
 
 Пример ответа:
@@ -49,6 +92,7 @@ curl --location 'http://localhost:8080/expressions/685da2a4-9ff8-4815-b954-297b8
 Запрос
 ```bash
 curl --location 'http://localhost:8080/expressions'
+--header 'Cookie: Authorization-Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJkZjQ1OTg0NS1kMjI4LTQ5NjYtYTAxMC1mNzU1NTRlZDU0Y2IifQ.mSRR4Vk0qI8TyqRaKx6z1c2z-TkPqbrTa8U3NKyIbK4' \
 ```
 
 Пример ответа:
@@ -78,6 +122,7 @@ curl --location 'http://localhost:8080/expressions'
 Запрос
 ```bash
 curl --location 'http://localhost:8080/operation/all'
+--header 'Cookie: Authorization-Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJkZjQ1OTg0NS1kMjI4LTQ5NjYtYTAxMC1mNzU1NTRlZDU0Y2IifQ.mSRR4Vk0qI8TyqRaKx6z1c2z-TkPqbrTa8U3NKyIbK4' \
 ```
 
 Пример ответа:
