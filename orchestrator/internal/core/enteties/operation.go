@@ -11,6 +11,7 @@ type Operation struct {
 
 type ArithmeticExpression struct {
 	ID         uuid.UUID
+	UserID     string
 	Expression string
 	Status     string
 	Operations []*Operation

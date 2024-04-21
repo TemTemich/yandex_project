@@ -39,12 +39,19 @@ func Run() error {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
+
+	router.Route("/api/v1", func(r chi.Router) {
+		r.Post("/register", h.CreateUser)
+		r.Post("/login", h.Login)
+	})
+
 	router.Route("/operation", func(r chi.Router) {
-		r.Get("/all", h.GetOperations)
 		r.Post("/update", h.UpdateOperation)
+		r.Get("/all", h.GetOperations)
 	})
 
 	router.Route("/expressions", func(r chi.Router) {
+		r.Use(handlers.WithAuthorization)
 		r.Post("/", h.AddExpression)
 		r.Get("/", h.GetExpressions)
 		r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {

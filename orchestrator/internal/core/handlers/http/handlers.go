@@ -36,8 +36,8 @@ func (h *Handlers) AddExpression(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	expressionID, err := h.service.AddExpression(expression.Expression)
+	ctx := req.Context()
+	expressionID, err := h.service.AddExpression(ctx, expression.Expression)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
@@ -103,7 +103,7 @@ func (h *Handlers) GetExpressionByID(res http.ResponseWriter, req *http.Request)
 	id := req.Context().Value("id")
 	ID, _ := uuid.Parse(id.(string))
 	log.Println("id", ID)
-	expression, err := h.service.GetExpression(ID)
+	expression, err := h.service.GetExpression(req.Context(), ID)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return

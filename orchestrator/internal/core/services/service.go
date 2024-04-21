@@ -12,11 +12,13 @@ import (
 )
 
 type storage interface {
-	AddExpression(expression *enteties.ArithmeticExpression) error
-	GetExpression(expressionID uuid.UUID) (*enteties.ArithmeticExpression, error)
+	AddExpression(ctx context.Context, expression *enteties.ArithmeticExpression) error
+	GetExpression(ctx context.Context, expressionID uuid.UUID) (*enteties.ArithmeticExpression, error)
 	UpdateOperation(ctx context.Context, id uuid.UUID, result string) error
 	GetOperations(ctx context.Context) ([]*enteties.Operation, error)
 	GetExpressions(ctx context.Context) ([]*enteties.ArithmeticExpression, error)
+	CreateUser(ctx context.Context, user *enteties.User) error
+	Login(context.Context, *enteties.User) (*enteties.User, error)
 }
 
 type calculator interface {
@@ -45,11 +47,13 @@ func (s *Service) parseExpression(expression string) []*enteties.Operation {
 	return operations
 }
 
-func (s *Service) AddExpression(expression string) (uuid.UUID, error) {
+func (s *Service) AddExpression(ctx context.Context, expression string) (uuid.UUID, error) {
 	idExpression := uuid.New()
 	operations := s.parseExpression(expression)
+	userID := ctx.Value("user_id").(string)
 	expr := &enteties.ArithmeticExpression{
 		ID:         idExpression,
+		UserID:     userID,
 		Operations: operations,
 		Expression: expression,
 	}
@@ -66,8 +70,8 @@ func (s *Service) GetExpressions(ctx context.Context) ([]*enteties.ArithmeticExp
 	return s.storage.GetExpressions(ctx)
 }
 
-func (s *Service) GetExpression(id uuid.UUID) (*enteties.ArithmeticExpression, error) {
-	return s.storage.GetExpression(id)
+func (s *Service) GetExpression(ctx context.Context, id uuid.UUID) (*enteties.ArithmeticExpression, error) {
+	return s.storage.GetExpression(ctx, id)
 }
 
 func (s *Service) UpdateOperation(id uuid.UUID, operation string) error {
@@ -95,7 +99,7 @@ func (s *Service) Run() {
 				s.cancel()
 				return
 			}
-			s.storage.AddExpression(expr)
+			s.storage.AddExpression(s.ctx, expr)
 			wg := &sync.WaitGroup{}
 			wg.Add(len(expr.Operations))
 			for _, op := range expr.Operations {
